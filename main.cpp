@@ -18,8 +18,8 @@ double euclideanDistance(vector<double> currentObj, vector<double> neighbor) {
     //We need sum to later sqrt it
     double sum = 0;
 
-    //Iterate through each feature and calculate the sum
-    for (int i = 0; i < currentObj.size(); ++i) {
+    //Iterate through each feature and calculate the sum starting at 1 to exclude the class label
+    for (int i = 1; i < currentObj.size(); ++i) {
         sum += pow((currentObj.at(i) - neighbor.at(i)), 2);
     }
 
@@ -27,37 +27,65 @@ double euclideanDistance(vector<double> currentObj, vector<double> neighbor) {
     return sqrt(sum);
 }
 
+//Returns default rate for forward selection
+float defaultRate(vector<vector <double> >& data) {
+    //Stores count for both classes
+    float class1 = 0.0 ;
+    float class2 = 0.0;
+
+    //Iterate through each row and keep track of the size of each class label
+    for (int i = 0; i < data.size(); ++i) {
+        vector<double> classifyRow = data.at(i);
+        int currClass = classifyInstance(classifyRow);
+
+        if (currClass == 1) {
+            ++class1;
+        }
+        
+        else{
+            ++class2;
+        }
+    }
+
+    //Return the default rate of the highest class label we find
+    if (class1 > class2) {
+        return (class1 / data.size());
+    }
+    else {
+        return (class2 / data.size());
+    }
+}
+
 //Accuracy function needed for forward selection
 float leaveOneOutCrossValidation(vector<vector <double> >& data, int totalFeatures, vector <int> currFeatures, int potentialNewFeature) {
     //Count need to check how many instances we classified correctly
     float correctlyClassifiedCnt = 0;
+
+    //Get default rate when no features are passed in
+    if (potentialNewFeature == -1) {
+        return defaultRate(data);
+    }
 
     //Iterates through each row
     for (int i = 0; i < data.size(); ++i) {
         //We want to classify each object based on its features
         vector<double> classifyObject = data.at(i);
 
-        //We erase the first data point as it is simply the class label
-        classifyObject.erase(classifyObject.begin());
+        //Returns the label of the current instance
+        int currInstanceLabel = classifyInstance(data[i]);
 
         //Create a temp vector with potential new feature added in case we do not add it at the end
         vector<int> temporaryAddingNewFeature = currFeatures;
         temporaryAddingNewFeature.push_back(potentialNewFeature);
 
-        //If it is the set with all features we do not need to delete any features, only needed once after we do delete features
-        if (potentialNewFeature != -1) {
-            //Sets all features not in the current feature set to 0
-            for (int k = 0; k < totalFeatures; ++k) {
-                auto it = find(temporaryAddingNewFeature.begin(), temporaryAddingNewFeature.end(), k);
+        //Sets all features not in the current feature set to 0
+        for (int k = 1; k < totalFeatures + 1; ++k) {
+            auto it = find(temporaryAddingNewFeature.begin(), temporaryAddingNewFeature.end(), k);
 
-                if (it == temporaryAddingNewFeature.end()) {
-                    classifyObject.at(k) = 0;
-                }
+            if (it == temporaryAddingNewFeature.end()) {
+                classifyObject.at(k) = 0;
             }
         }
-
-        //Returns the label of the current instance
-        int currInstanceLabel = classifyInstance(data[i]);
 
         //Initially nearest neighbor is infinity away
         double nearestNeighborDist = numeric_limits<double>::infinity();
@@ -73,18 +101,12 @@ float leaveOneOutCrossValidation(vector<vector <double> >& data, int totalFeatur
                 //Neighbor we want to compare to
                 vector<double> currNeighbor = data.at(j);
 
-                //We erase the first data point as it is simply the class label
-                currNeighbor.erase(currNeighbor.begin());
+                //Sets all features not in the current feature set to 0
+                for (int l = 1; l < totalFeatures + 1; ++l) {
+                    auto it = find(temporaryAddingNewFeature.begin(), temporaryAddingNewFeature.end(), l);
 
-                //If it is the set with all features we do not need to delete any features, only needed once after we do delete features
-                if (potentialNewFeature != -1) {
-                    //Sets all features not in the current feature set to 0
-                    for (int l = 0; l < totalFeatures; ++l) {
-                        auto it = find(temporaryAddingNewFeature.begin(), temporaryAddingNewFeature.end(), l);
-
-                        if (it == temporaryAddingNewFeature.end()) {
-                            currNeighbor.at(l) = 0;
-                        }
+                    if (it == temporaryAddingNewFeature.end()) {
+                        currNeighbor.at(l) = 0;
                     }
                 }
 
@@ -114,27 +136,18 @@ void forwardSelection(vector<vector <double> > data, int numFeatures) {
     //Holds features already evaluated and remove from next level of search tree
     vector <int> currFeatures;
 
-    //Vector of all the features for initial accuracy needed
-    vector <int> allFeatures;
-    for (int l = 0; l < numFeatures; ++l) {
-        allFeatures.push_back(l);
-    }
-
-    //Get accuracy with all features and print it to screen
-    float accuracyWithAllFeatures = leaveOneOutCrossValidation(data, numFeatures, allFeatures, -1);
-    cout << "Running nearest neighbor with all " << numFeatures << " features, using \"leave-one-out\" evaluation, I get an accuracy of " << accuracyWithAllFeatures * 100 << "%" << endl;
+    //Get accuracy with no features and print it to screen
+    float overallBestAcc = leaveOneOutCrossValidation(data, numFeatures, currFeatures, -1);
+    cout << "Running nearest neighbor with no features, using \"leave-one-out\" evaluation, I get an accuracy of " << overallBestAcc * 100 << "%" << endl;
 
     cout << "Beginning search." << endl;
 
     //Used for formatting purposes
     bool firstRound = true;
 
-    //Needed to correctly return subset with highest accuracy
-    vector <int> bestFeatureSubset;
+    //Needed to correctly return subset with highest accuracy start it with default rate subset, so no feature accuracy
+    vector <int> bestFeatureSubset = currFeatures;
     vector<vector<int> > allFeatureSubsets;
-    int cnt = -1;
-    //Create new overall best accuracy
-    float overallBestAcc = 0;
 
     // 2. For loop that walks down the tree for all features (outer for loop)
     for (int i = 0; i < numFeatures; ++i) {        
@@ -198,7 +211,6 @@ void forwardSelection(vector<vector <double> > data, int numFeatures) {
         if (bestAccuracy > overallBestAcc) {
             overallBestAcc = bestAccuracy;
             bestFeatureSubset.push_back(featureToAdd);
-            cnt = i;
         } 
 
         //After first level of tree, formatting not needed
@@ -271,7 +283,7 @@ vector<vector<double> > turnDataIntoRows(vector<double> fullData, int numFeature
 
 int main() {
     //Follows fornat for traceback
-    cout << "Welcome to the Feature Selection Algorithm." << endl;
+    cout << "Welcome to the David Aispuro Feature Selection Algorithm." << endl;
 
     //Allows user to enter in file
     string fileName;
