@@ -47,8 +47,8 @@ Again, like the small data set, the accuracy with all features is 68.60% and the
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/DavidA346/CS170-Project-2.git
-cd CS170-Project-2
+git clone https://github.com/DavidA346/Feature-Selection-with-Nearest-Neighbor-Classifier.git
+cd Feature-Selection-with-Nearest-Neighbor-Classifier
 ```
 2. **Compile and Run the Program**
 ```bash
