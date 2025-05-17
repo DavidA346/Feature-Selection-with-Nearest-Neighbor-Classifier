@@ -22,7 +22,7 @@ Below is Figure 2, which shows the result I received when running “CS170_Small
 
 Since it is a small data set, we see that our accuracy with all features and no features is the same as above in forward selection, 85.40% and 82.60% respectively. This actually is shown at every subset. Every subset for backward elimination results in the same accuracy as forward selection. Thus, again we see that the best subset is: {1, 2} with an accuracy of 96.00%
 
-** Conclusion for Small Data Set: ** After running both algorithms, I can conclude that features “1” and “2” are the strongest features for this data set. If I was asked my boss to deploy this model, I would choose the subset {1, 2} and would expect an accuracy of 96.00% for this model.
+**Conclusion for Small Data Set:** After running both algorithms, I can conclude that features “1” and “2” are the strongest features for this data set. If I was asked my boss to deploy this model, I would choose the subset {1, 2} and would expect an accuracy of 96.00% for this model.
 
 ### Large Data Set
 
@@ -38,7 +38,7 @@ Below is Figure 4, which shows the result I received when running “CS170_Large
 
 Again, like the small data set, the accuracy with all features is 68.60% and the accuracy with no features is 80.20%. However, towards the end we see that backward elimination finds a different optimal subset for the large data set, showing it is slightly less accurate than forward selection for this data set. It finds subset {26, 31} with an accuracy of 85.80%. Since it also finds feature “26” as a strong feature, we can conclude that feature “26” is without a doubt a strong feature.
 
-** Conclusion for Large Data Set: ** After running both algorithms, I can conclude that features “26” and “38” are the strongest features for this data set. There is slight evidence for feature “31” being a useful feature, but it cannot be determined without further research. Therefore, if I was asked my boss to deploy this model, I would choose the subset {26, 38} and would expect an accuracy of 96.60% for this model.
+**Conclusion for Large Data Set:** After running both algorithms, I can conclude that features “26” and “38” are the strongest features for this data set. There is slight evidence for feature “31” being a useful feature, but it cannot be determined without further research. Therefore, if I was asked my boss to deploy this model, I would choose the subset {26, 38} and would expect an accuracy of 96.60% for this model.
 
 ---
 
@@ -49,3 +49,14 @@ Again, like the small data set, the accuracy with all features is 68.60% and the
 ```bash
 git clone https://github.com/DavidA346/CS170-Project-2.git
 cd CS170-Project-2
+```
+2. **Compile and Run the Program**
+```bash
+g++ -std=c++11 -o out main.cpp
+./out
+```
+That's it!! After that select the file you would like to run and choose either Forward Selection or Backward Elimination.
+
+### Sample Screenshot
+
+<img width="628" alt="Image" src="https://github.com/user-attachments/assets/dfe43dc5-6ac8-4957-9e53-9d010aa5e004" />
