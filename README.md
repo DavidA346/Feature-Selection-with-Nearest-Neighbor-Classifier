@@ -8,7 +8,9 @@ The purpose of this Project, given to us by Dr. Eamonn Keogh as part of the cour
 
 ## Results
 Below is Figure 1, which shows the result I received when running “CS170_Small_Data__97.txt”, which was my small data set, through forward selection to begin with. It had 6 features and 500 instances.
+
 <img width="441" alt="Image" src="https://github.com/user-attachments/assets/06eb4674-3358-44a7-b627-a3447bfa5c4e" />
+
 We first begin with no features, also known as the default rate, and this results in an accuracy of 82.60%. From here, we begin adding features that result in the best accuracy at that level. We see a small jump when feature {2} is added and another major jump when we add feature 1, thus the subset {2, 1} with an accuracy of 96.00%. From here, adding new features results in smaller decreases in accuracy until finally when we have all features we get an accuracy of 85.40%. Thus, from this, we can conclude that the best subset of features for the small data set is subset: {2, 1}. To confirm this, we will use backward elimination on the same data set shown below.
 
 ---
